@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html ng-app = "MapApp">
+  <head>
+  <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <div id="map"></div>
+    <div ng-controller = "MapController as map" class = "info">
+      <h2>Info</h2>
+      <a href="https://api.instagram.com/oauth/authorize/?client_id=e18158bc58ec40a4966c01b12cef2d97&redirect_uri=http://localhost/instamaps&response_type=token">Log in</a>
+      <ul>
+        <li ng-repeat = "location in locations">
+          {{location.name}}
+          <button ng-click = "map.showPhotos(location.id)" type="" name="button">Show Photos</button>
+        </li>
+      </ul>
+    </div>
+    <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.6/angular.min.js"></script>
+    <script type="text/javascript" src = "script.js"></script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD1ELFY_wNhgHY2mxyZDd4WKvmhaH9pk40&callback=initMap"></script>
+  </body>
+</html>

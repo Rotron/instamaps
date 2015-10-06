@@ -1,47 +1,21 @@
-var app = angular.module('MapApp', [])
-var controller = app.controller('MapController', ['$scope', function($scope)
-{
-  this.showPhotos = function(id)
-  {
-    var photos = getInstaPhotos(id);
-
-  };
-
-}]);
-
-function getInstaPhotos(id)
-{
-  var token = window.location.hash.substring(14);
-  var query = 'https://api.instagram.com/v1/locations/' + id + '/media/recent';
-  $.ajax
-  ({
-    url: query,
-    data:
-    {
-      access_token: token,
-      format: "json"
-    },
-    success: function(data)
-    {
-      return (data);
-    },
-    dataType: "jsonp"
-  });
-}
+var marker;
+var map;
+var app;
+var controller;
 
 function initMap()
 {
   // Create a map object and specify the DOM element for display.
-  var map = new google.maps.Map(document.getElementById('map'),
+  map = new google.maps.Map(document.getElementById('map'),
   {
-    center: {lat: -34.397, lng: 150.644},
+    center: {lat: -37.8136, lng: 144.9631},
     scrollwheel: true,
     zoom: 8
   });
 
-  var marker = new google.maps.Marker(
+  marker = new google.maps.Marker(
   {
-    position:  {lat: -34.397, lng: 150.644},
+    position:  {lat: -37.8136, lng: 144.9631},
     map: map,
     title: 'Click to zoom',
     draggable: true
@@ -51,32 +25,77 @@ function initMap()
   {
     //when the marker is moved get the end position
     //query insta for locations at the point
-    getLocations(marker.getPosition());
+    $('body').scope().getLocations(marker.getPosition());
   });
 }
 
-function getLocations(latlong)
+//Angular code
+app = angular.module('MapApp', ['ngResource'])
+.config(['$resourceProvider', function($resourceProvider)
 {
-  var token = window.location.hash.substring(14);
-  var lat = latlong['H'];
-  var long = latlong['L'];
-  var query = "https://api.instagram.com/v1/locations/search";
-  $.ajax
-  ({
-    url: query,
-    data:
+  $resourceProvider.defaults.stripTrailingSlashes = false;
+}])
+.controller('MapController', ['$scope', '$http', '$resource',  function($scope, $http, $resource)
+{
+
+  var instaLocations = $resource
+  (
+    "https://api.instagram.com/v1/locations/search",
     {
-      lat: lat,
-      lng: long,
-      access_token: token,
-      format: "json"
+      callback: "JSON_CALLBACK"
     },
-    success: function(data)
     {
-      var scope = $('.info').scope();
-      scope.locations = data.data;
-      scope.$apply();
+      getLocations:
+      {
+        method: "JSONP"
+      }
+    }
+  );
+  var instaPhotos = $resource
+  (
+    'https://api.instagram.com/v1/locations/:id/media/recent',
+    {
+      id: '@id',
+      callback: "JSON_CALLBACK"
     },
-    dataType: "jsonp"
-  });
-}
+    {
+      getPhotos:
+      {
+        method: "JSONP"
+      }
+    }
+  );
+  $scope.getLocations = function(latlong)
+  {
+    var token = window.location.hash.substring(14);
+    var lat = latlong.lat();
+    var long = latlong.lng();
+    var locations = instaLocations.getLocations
+    (
+      {
+        lat: lat,
+        lng: long,
+        access_token: token
+      },
+      function(data)
+      {
+        $scope.locations = locations.data;
+      }
+    );
+  }
+  $scope.showPhotos = function(id)
+  {
+    var token = window.location.hash.substring(14);
+    var photos = instaPhotos.getPhotos
+    (
+      {
+        id: id,
+        access_token: token
+      },
+      function(data)
+      {
+        $scope.photos = data.data;
+      }
+    );
+  };
+}]);

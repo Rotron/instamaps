@@ -1,23 +1,50 @@
 <!DOCTYPE html>
 <html ng-app = "MapApp">
   <head>
-  <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="bootstrap.min.css">
+    <link rel="stylesheet" href="font-awesome.css">
+    <link rel="stylesheet" href="ct-paper.css">
+    <link rel="stylesheet" href="styles.css">
+  <title>InstaMaps</title>
   </head>
-  <body>
+  <body ng-controller = "MapController as map">
     <div id="map"></div>
-    <div ng-controller = "MapController as map" class = "info">
-      <h2>Info</h2>
-      <a href="https://api.instagram.com/oauth/authorize/?client_id=e18158bc58ec40a4966c01b12cef2d97&redirect_uri=http://localhost/instamaps&response_type=token">Log in</a>
-      <ul>
-        <li ng-repeat = "location in locations">
-          {{location.name}}
-          <button ng-click = "map.showPhotos(location.id)" type="" name="button">Show Photos</button>
-        </li>
-      </ul>
+    <div class = "photos">
+      <h3>Photos</h3>
+      <h5 ng-show = "photos.length===0">
+        No Images
+      </h5>
+      <div class = "image-wrapper" ng-repeat = "photo in photos">
+        <img class = "insta-photo" ng-src="{{photo.images.standard_resolution.url}}" />
+        <h6>{{photo.user.username}}</h6>
+        <img class = "profile-pic" ng-src="{{photo.user.profile_picture}}" alt="">
+        <p>{{photo.caption.text}}</p>
+      </div>
+    </div>
+    <div class = "info">
+      <h3>Locations</h3>
+      <a href="https://api.instagram.com/oauth/authorize/?client_id=e18158bc58ec40a4966c01b12cef2d97&redirect_uri=http://localhost/instamaps&response_type=token">
+        <!-- <button class = "btn btn-success">
+          Log in
+        </button> -->
+      </a>
+      <table>
+        <tr ng-repeat = "location in locations">
+          <td>
+            {{location.name}}
+          </td>
+          <td>
+            <button class = "btn btn-primary btn-sm" ng-click = "showPhotos(location.id)" type="" name="button">Show Photos</button>
+          </td>
+        </tr>
+      </table>
     </div>
     <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
     <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.6/angular.min.js"></script>
+    <script src="jquery-ui.js"></script>
+    <script src="bootstrap.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script>
+    <script src="https://code.angularjs.org/1.3.15/angular-resource.min.js"></script>
     <script type="text/javascript" src = "script.js"></script>
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD1ELFY_wNhgHY2mxyZDd4WKvmhaH9pk40&callback=initMap"></script>
   </body>
